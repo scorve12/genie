@@ -1,5 +1,6 @@
 import CoffeeCard from '@/components/CoffeeCard';
 import Hero from '@/components/Hero';
+import Navigation from '@/components/Navigation';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
 import { coffees } from '@/data/coffees';
@@ -7,6 +8,7 @@ import { coffees } from '@/data/coffees';
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+      <Navigation />
       <Hero />
 
       <main className="container mx-auto px-6 py-16">
