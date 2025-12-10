@@ -2,48 +2,60 @@
 
 import { useState } from 'react';
 import { UserPreferences } from '@/utils/recommendationEngine';
-
-interface Question {
-  id: keyof UserPreferences;
-  question: string;
-  description: string;
-}
-
-const questions: Question[] = [
-  {
-    id: 'likesAcidity',
-    question: '산미가 있는 원두를 선호하시나요?',
-    description: '밝고 상큼한 시트러스나 과일 같은 산미를 좋아하시나요?'
-  },
-  {
-    id: 'likesFullBody',
-    question: '진한 바디감을 원하시나요?',
-    description: '묵직하고 풍부한 질감의 커피를 선호하시나요?'
-  },
-  {
-    id: 'likesChocolateNut',
-    question: '초콜릿이나 견과류 향을 좋아하시나요?',
-    description: '달콤하고 고소한 초콜릿, 캐러멜, 너트 향을 선호하시나요?'
-  },
-  {
-    id: 'likesFruityFloral',
-    question: '과일향이나 플로럴 향을 선호하시나요?',
-    description: '꽃향기나 베리, 와인 같은 화사한 향을 좋아하시나요?'
-  },
-  {
-    id: 'likesDarkRoast',
-    question: '다크 로스팅을 선호하시나요?',
-    description: '진하고 강한 맛의 다크 로스팅 커피를 원하시나요?'
-  }
-];
+import { useQuestions } from '@/hooks/useQuestions';
 
 interface RecommendationQuizProps {
   onComplete: (preferences: UserPreferences) => void;
 }
 
 export default function RecommendationQuiz({ onComplete }: RecommendationQuizProps) {
+  const { questions, loading, error } = useQuestions(true); // activeOnly = true
   const [currentStep, setCurrentStep] = useState(0);
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({});
+
+  // 질문이 없거나 로딩 중일 때
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 md:p-12">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">설문 로딩 중...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || questions.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 md:p-12">
+          <div className="text-center">
+            <svg
+              className="mx-auto h-12 w-12 text-red-500 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              설문을 불러올 수 없습니다
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {error || '활성화된 질문이 없습니다. 관리자에게 문의해주세요.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep) / questions.length) * 100;
@@ -51,7 +63,7 @@ export default function RecommendationQuiz({ onComplete }: RecommendationQuizPro
   const handleAnswer = (answer: boolean) => {
     const newPreferences = {
       ...preferences,
-      [currentQuestion.id]: answer
+      [currentQuestion.preferenceKey]: answer
     };
 
     setPreferences(newPreferences);
@@ -109,7 +121,7 @@ export default function RecommendationQuiz({ onComplete }: RecommendationQuizPro
             </svg>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-            {currentQuestion.question}
+            {currentQuestion.questionText}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
             {currentQuestion.description}
