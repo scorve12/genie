@@ -3,30 +3,29 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useQuestions } from '@/hooks/useQuestions';
-import { Question } from '@/types/question';
-import QuestionTable from '@/components/admin/QuestionTable';
+import { useBeans } from '@/hooks/useBeans';
+import { Coffee } from '@/types/coffee';
+import BeanTable from '@/components/admin/BeanTable';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
-import EditQuestionModal from '@/components/admin/EditQuestionModal';
+import EditBeanModal from '@/components/admin/EditBeanModal';
 import Button from '@/components/ui/Button';
 
-export default function QuestionsPage() {
+export default function AdminPage() {
   const router = useRouter();
-  const { questions, loading, error, removeQuestion, editQuestion } =
-    useQuestions();
+  const { beans, loading, error, removeBean, editBean } = useBeans();
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
-    question: Question | null;
+    bean: Coffee | null;
   }>({
     isOpen: false,
-    question: null,
+    bean: null,
   });
   const [editModal, setEditModal] = useState<{
     isOpen: boolean;
-    question: Question | null;
+    bean: Coffee | null;
   }>({
     isOpen: false,
-    question: null,
+    bean: null,
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -36,39 +35,25 @@ export default function QuestionsPage() {
     type: 'success' | 'error';
   }>({ show: false, message: '', type: 'success' });
 
-  const handleEdit = (question: Question) => {
-    setEditModal({ isOpen: true, question });
+  const handleEdit = (bean: Coffee) => {
+    setEditModal({ isOpen: true, bean });
   };
 
-  const handleDeleteClick = (question: Question) => {
-    setDeleteModal({ isOpen: true, question });
-  };
-
-  const handleToggleActive = async (question: Question) => {
-    try {
-      await editQuestion(question.id, { isActive: !question.isActive });
-      showToast(
-        `질문이 ${!question.isActive ? '활성화' : '비활성화'}되었습니다.`,
-        'success'
-      );
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : '상태 변경에 실패했습니다.';
-      showToast(errorMessage, 'error');
-    }
+  const handleDeleteClick = (bean: Coffee) => {
+    setDeleteModal({ isOpen: true, bean });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteModal.question) return;
+    if (!deleteModal.bean) return;
 
     setIsDeleting(true);
     try {
-      await removeQuestion(deleteModal.question.id);
-      showToast('질문이 성공적으로 삭제되었습니다.', 'success');
-      setDeleteModal({ isOpen: false, question: null });
+      await removeBean(deleteModal.bean.id);
+      showToast('원두가 성공적으로 삭제되었습니다.', 'success');
+      setDeleteModal({ isOpen: false, bean: null });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : '질문 삭제에 실패했습니다.';
+        err instanceof Error ? err.message : '원두 삭제에 실패했습니다.';
       showToast(errorMessage, 'error');
     } finally {
       setIsDeleting(false);
@@ -76,20 +61,20 @@ export default function QuestionsPage() {
   };
 
   const handleDeleteCancel = () => {
-    setDeleteModal({ isOpen: false, question: null });
+    setDeleteModal({ isOpen: false, bean: null });
   };
 
-  const handleEditSubmit = async (data: Question) => {
-    if (!editModal.question) return;
+  const handleEditSubmit = async (data: Coffee) => {
+    if (!editModal.bean) return;
 
     setIsEditing(true);
     try {
-      await editQuestion(editModal.question.id, data);
-      showToast('질문이 성공적으로 수정되었습니다.', 'success');
-      setEditModal({ isOpen: false, question: null });
+      await editBean(editModal.bean.id, data);
+      showToast('원두가 성공적으로 수정되었습니다.', 'success');
+      setEditModal({ isOpen: false, bean: null });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : '질문 수정에 실패했습니다.';
+        err instanceof Error ? err.message : '원두 수정에 실패했습니다.';
       showToast(errorMessage, 'error');
     } finally {
       setIsEditing(false);
@@ -97,7 +82,7 @@ export default function QuestionsPage() {
   };
 
   const handleEditCancel = () => {
-    setEditModal({ isOpen: false, question: null });
+    setEditModal({ isOpen: false, bean: null });
   };
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -132,15 +117,15 @@ export default function QuestionsPage() {
               </svg>
             </Link>
             <div>
-              <h1 className="text-3xl font-bold">설문 질문 관리</h1>
+              <h1 className="text-3xl font-bold">원두 관리</h1>
               <p className="text-amber-100 mt-1">
-                추천 설문 질문을 추가, 수정, 삭제할 수 있습니다
+                원두를 추가, 수정, 삭제할 수 있습니다
               </p>
             </div>
           </div>
-          <div className="flex justify-end">
+          <div className="flex gap-3 justify-end">
             <Button
-              onClick={() => router.push('/admin/questions/new')}
+              onClick={() => router.push('/admin/beans/new')}
               variant="secondary"
             >
               <svg
@@ -156,7 +141,7 @@ export default function QuestionsPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              새 질문 추가
+              새 원두 추가
             </Button>
           </div>
         </div>
@@ -196,11 +181,10 @@ export default function QuestionsPage() {
             </div>
           ) : (
             <div className="p-6">
-              <QuestionTable
-                questions={questions}
+              <BeanTable
+                beans={beans}
                 onEdit={handleEdit}
                 onDelete={handleDeleteClick}
-                onToggleActive={handleToggleActive}
               />
             </div>
           )}
@@ -210,16 +194,16 @@ export default function QuestionsPage() {
       {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
-        beanName={deleteModal.question?.questionText || ''}
+        beanName={deleteModal.bean?.name || ''}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
         isDeleting={isDeleting}
       />
 
-      {/* Edit Question Modal */}
-      <EditQuestionModal
+      {/* Edit Bean Modal */}
+      <EditBeanModal
         isOpen={editModal.isOpen}
-        question={editModal.question}
+        bean={editModal.bean}
         onSubmit={handleEditSubmit}
         onClose={handleEditCancel}
         isSubmitting={isEditing}
