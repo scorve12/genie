@@ -1,5 +1,7 @@
 import { Question } from '@/types/question';
 
+const baseDate = '2025-12-12T17:50:37.861Z';
+
 export const questions: Question[] = [
   {
     id: 1,
@@ -8,6 +10,8 @@ export const questions: Question[] = [
     description: '밝고 상큼한 시트러스나 과일 같은 산미를 좋아하시나요?',
     order: 1,
     isActive: true,
+    createdAt: baseDate,
+    updatedAt: baseDate,
   },
   {
     id: 2,
@@ -16,6 +20,8 @@ export const questions: Question[] = [
     description: '묵직하고 풍부한 질감의 커피를 선호하시나요?',
     order: 2,
     isActive: true,
+    createdAt: baseDate,
+    updatedAt: baseDate,
   },
   {
     id: 3,
@@ -24,6 +30,8 @@ export const questions: Question[] = [
     description: '달콤하고 고소한 초콜릿, 캐러멜, 너트 향을 선호하시나요?',
     order: 3,
     isActive: true,
+    createdAt: baseDate,
+    updatedAt: baseDate,
   },
   {
     id: 4,
@@ -32,6 +40,8 @@ export const questions: Question[] = [
     description: '꽃향기나 베리, 와인 같은 화사한 향을 좋아하시나요?',
     order: 4,
     isActive: true,
+    createdAt: baseDate,
+    updatedAt: baseDate,
   },
   {
     id: 5,
@@ -40,5 +50,7 @@ export const questions: Question[] = [
     description: '진하고 강한 맛의 다크 로스팅 커피를 원하시나요?',
     order: 5,
     isActive: true,
+    createdAt: baseDate,
+    updatedAt: baseDate,
   },
 ];

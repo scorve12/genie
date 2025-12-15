@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { questionsStore } from '@/lib/data/questionsStore';
+import { questions } from '@/data/questions';
 import { Question } from '@/types/question';
 
 // GET /api/questions/:id - 단일 질문 조회
@@ -11,7 +11,8 @@ export async function GET(
     const { id } = await params;
     const questionId = parseInt(id);
 
-    const question = questionsStore.getById(questionId);
+    // TODO: 백엔드에서 데이터베이스에서 가져오도록 구현
+    const question = questions.find((q) => q.id === questionId);
 
     if (!question) {
       return NextResponse.json(
@@ -49,14 +50,10 @@ export async function PUT(
     const questionId = parseInt(id);
     const updates: Partial<Question> = await request.json();
 
-    console.log('PUT /api/questions/:id - Request received');
-    console.log('Question ID:', questionId);
-    console.log('Updates:', JSON.stringify(updates, null, 2));
+    // TODO: 백엔드에서 데이터베이스 업데이트 구현
+    const question = questions.find((q) => q.id === questionId);
 
-    const updatedQuestion = questionsStore.update(questionId, updates);
-
-    if (!updatedQuestion) {
-      console.log('Question not found:', questionId);
+    if (!question) {
       return NextResponse.json(
         {
           success: false,
@@ -66,20 +63,24 @@ export async function PUT(
       );
     }
 
-    console.log('Question updated successfully:', updatedQuestion);
+    const updatedQuestion: Question = {
+      ...question,
+      ...updates,
+      id: questionId, // ID는 변경 불가
+    };
+
     return NextResponse.json({
       success: true,
       data: updatedQuestion,
     });
   } catch (error) {
     console.error('Error updating question:', error);
-    console.error('Error details:', error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update question',
+        error: 'Failed to update question',
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }
@@ -93,9 +94,10 @@ export async function DELETE(
     const { id } = await params;
     const questionId = parseInt(id);
 
-    const deleted = questionsStore.delete(questionId);
+    // TODO: 백엔드에서 데이터베이스에서 삭제 구현
+    const question = questions.find((q) => q.id === questionId);
 
-    if (!deleted) {
+    if (!question) {
       return NextResponse.json(
         {
           success: false,

@@ -1,4 +1,5 @@
 import { Question } from '@/types/question';
+import { getApiUrl } from '@/lib/config/api';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -8,7 +9,7 @@ interface ApiResponse<T> {
 }
 
 export async function getQuestions(activeOnly = false): Promise<Question[]> {
-  const url = activeOnly ? '/api/questions?active=true' : '/api/questions';
+  const url = activeOnly ? getApiUrl('questions?active=true') : getApiUrl('questions');
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -29,7 +30,7 @@ export async function getQuestions(activeOnly = false): Promise<Question[]> {
 }
 
 export async function getQuestion(id: number): Promise<Question> {
-  const response = await fetch(`/api/questions/${id}`, {
+  const response = await fetch(getApiUrl(`questions/${id}`), {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -51,7 +52,7 @@ export async function getQuestion(id: number): Promise<Question> {
 export async function createQuestion(
   question: Omit<Question, 'id'>
 ): Promise<Question> {
-  const response = await fetch('/api/questions', {
+  const response = await fetch(getApiUrl('questions'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export async function updateQuestion(
   id: number,
   updates: Partial<Question>
 ): Promise<Question> {
-  const response = await fetch(`/api/questions/${id}`, {
+  const response = await fetch(getApiUrl(`questions/${id}`), {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(id: number): Promise<void> {
-  const response = await fetch(`/api/questions/${id}`, {
+  const response = await fetch(getApiUrl(`questions/${id}`), {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',

@@ -3,9 +3,29 @@ import Hero from '@/components/Hero';
 import Navigation from '@/components/Navigation';
 import CallToAction from '@/components/CallToAction';
 import Footer from '@/components/Footer';
-import { coffees } from '@/data/coffees';
+import { Coffee } from '@/types/coffee';
 
-export default function Home() {
+async function getBeans(): Promise<Coffee[]> {
+  try {
+    const res = await fetch('http://localhost:3000/api/beans', {
+      cache: 'no-store', // Always get fresh data
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch beans');
+    }
+
+    const data = await res.json();
+    return data.success ? data.data : [];
+  } catch (error) {
+    console.error('Error fetching beans:', error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const coffees = await getBeans();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
       <Navigation />
@@ -22,11 +42,19 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {coffees.map((coffee) => (
-            <CoffeeCard key={coffee.id} coffee={coffee} />
-          ))}
-        </div>
+        {coffees.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">
+              원두 데이터를 불러올 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {coffees.map((coffee) => (
+              <CoffeeCard key={coffee.id} coffee={coffee} />
+            ))}
+          </div>
+        )}
 
         <CallToAction />
       </main>

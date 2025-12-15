@@ -1,11 +1,17 @@
+'use client';
+
 // src/components/CoffeeCard.tsx
 import { Coffee } from '@/types/coffee';
+import { useRouter } from 'next/navigation';
+import BeanImage from './BeanImage';
 
 interface CoffeeCardProps {
   coffee: Coffee;
 }
 
 export default function CoffeeCard({ coffee }: CoffeeCardProps) {
+  const router = useRouter();
+
   const roastColors = {
     'Light': 'bg-amber-100 text-amber-800',
     'Medium': 'bg-amber-200 text-amber-900',
@@ -13,19 +19,22 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
     'Dark': 'bg-amber-400 text-amber-950'
   };
 
+  const imageUrl = coffee.image ? `http://localhost:3000${coffee.image}` : undefined;
+
+  const handleViewDetails = () => {
+    router.push(`/beans/${coffee.id}`);
+  };
+
   return (
     <div className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
       {/* Image Section */}
-      <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <svg
-            className="w-24 h-24 text-amber-300 dark:text-amber-700"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M2,21V19H20V21H2M20,8V5H18V8H20M20,3A2,2 0 0,1 22,5V8A2,2 0 0,1 20,10H18V13A4,4 0 0,1 14,17H8A4,4 0 0,1 4,13V3H20M16,5H6V13A2,2 0 0,0 8,15H14A2,2 0 0,0 16,13V5Z" />
-          </svg>
-        </div>
+      <div className="aspect-[4/3] relative overflow-hidden">
+        <BeanImage
+          src={imageUrl}
+          alt={coffee.name}
+          className="w-full h-full object-cover"
+          fallbackId={coffee.id}
+        />
         <div className="absolute top-4 right-4">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${roastColors[coffee.roastLevel]}`}>
             {coffee.roastLevel}
@@ -65,7 +74,10 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
         </div>
 
         {/* Action Button */}
-        <button className="w-full py-2 px-4 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+        <button
+          onClick={handleViewDetails}
+          className="w-full py-2 px-4 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+        >
           자세히 보기
         </button>
       </div>
